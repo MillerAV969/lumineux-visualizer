@@ -1,0 +1,220 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMINEUX — Визуализатор украшений</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --gold: #D4AF37; --dark: #0F0F0F; --light-dark: #1A1A1A; --white: #FFFFFF; --gray: #888888; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--white); line-height: 1.8; font-weight: 300; overflow-x: hidden; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
+
+        header { background: linear-gradient(180deg, rgba(15, 15, 15, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%); padding: 30px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
+        .tagline { font-size: 16px; color: var(--gray); margin-top: 10px; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 30px; }
+
+        .visualizer-section { background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(15, 15, 15, 0.8) 100%); padding: 60px; border-radius: 4px; margin-bottom: 60px; }
+
+        .upload-area { background: rgba(15, 15, 15, 0.8); border: 3px dashed var(--gold); border-radius: 4px; padding: 60px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .upload-area:hover { background: rgba(26, 26, 26, 0.9); border-color: #FFD700; }
+        .upload-icon { font-size: 64px; margin-bottom: 20px; }
+        .upload-text { font-size: 18px; color: var(--white); margin-bottom: 10px; }
+        .upload-hint { font-size: 14px; color: var(--gray); }
+
+        .upload-input { display: none; }
+
+        .preview-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; align-items: center; }
+        .preview-image { position: relative; overflow: hidden; border-radius: 4px; aspect-ratio: 4/3; background: var(--light-dark); }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .filters-panel { padding: 30px; background: rgba(26, 26, 26, 0.6); border-radius: 4px; }
+        .filter-title { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 20px; }
+
+        .filter-option { display: flex; align-items: center; padding: 15px; margin-bottom: 10px; background: rgba(15, 15, 15, 0.6); border-radius: 4px; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; }
+        .filter-option:hover { border-color: var(--gold); background: rgba(26, 26, 26, 0.8); }
+        .filter-option input { width: 20px; height: 20px; cursor: pointer; margin-right: 15px; accent-color: var(--gold); }
+        .filter-label { font-size: 15px; color: var(--white); }
+
+        .result-image { position: relative; text-align: center; }
+        .result-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
+        .result-title { font-size: 24px; color: var(--white); margin-bottom: 20px; }
+
+        .form-section { background: rgba(26, 26, 26, 0.8); padding: 40px; border-radius: 4px; margin-top: 40px; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
+        input[type="text"], input[type="email"], input[type="tel"], select { width: 100%; padding: 15px; background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--white); font-size: 15px; font-family: 'Inter', sans-serif; border-radius: 4px; transition: all 0.3s ease; }
+        input:focus, select:focus { outline: none; border-color: var(--gold); background: rgba(15, 15, 15, 0.95); }
+
+        .submit-btn { width: 100%; padding: 18px; background: transparent; border: 2px solid var(--gold); color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: all 0.4s ease; font-weight: 500; }
+        .submit-btn:hover { background: var(--gold); color: var(--dark); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3); }
+
+        .info-box { background: rgba(212, 175, 55, 0.1); border-left: 3px solid var(--gold); padding: 20px; margin: 20px 0; border-radius: 2px; }
+        .info-text { color: var(--gray); font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .preview-container { grid-template-columns: 1fr; }
+            .container { padding: 30px 15px; }
+            .visualizer-section { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Lumineux</div>
+        <p class="tagline">Визуализируйте украшение вашего дома</p>
+    </header>
+
+    <div class="container">
+        <div class="visualizer-section">
+            <h2 style="text-align: center; margin-bottom: 40px; font-size: 36px;">🏠 Примерьте украшения на ваш дом</h2>
+
+            <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Загрузите фото вашего дома</div>
+                <div class="upload-hint">или нажмите сюда для выбора файла</div>
+                <input type="file" id="photoInput" class="upload-input" accept="image/*" capture="environment">
+            </div>
+
+            <div class="preview-container" id="previewContainer" style="display: none;">
+                <div class="preview-image">
+                    <img id="previewImg" class="preview-img" src="" alt="Preview">
+                </div>
+
+                <div class="filters-panel">
+                    <div class="filter-title">🎨 Выберите стиль украшений:</div>
+                    
+                    <div class="filter-option">
+                        <input type="radio" id="style1" name="style" value="gold" checked onchange="updatePreview()">
+                        <label for="style1" class="filter-label">🟡 Золотой свет (классика)</label>
+                    </div>
+
+                    <div class="filter-option">
+                        <input type="radio" id="style2" name="style" value="white" onchange="updatePreview()">
+                        <label for="style2" class="filter-label">⚪ Холодный белый (минимализм)</label>
+                    </div>
+
+                    <div class="filter-option">
+                        <input type="radio" id="style3" name="style" value="blue" onchange="updatePreview()">
+                        <label for="style3" class="filter-label">🔵 Синий (современный)</label>
+                    </div>
+
+                    <div class="filter-option">
+                        <input type="radio" id="style4" name="style" value="mix" onchange="updatePreview()">
+                        <label for="style4" class="filter-label">🌈 Микс цветов (яркий)</label>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 30px;">
+                        <div class="info-text">💡 <strong>Совет:</strong> Используйте фото дневного времени для лучшего результата</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" id="formSection" style="display: none;">
+                <h3 style="margin-bottom: 30px;">Получите персональное предложение</h3>
+                
+                <form method="POST" action="https://formspree.io/f/xzbqwnvy">
+                    <input type="hidden" name="source" value="visualizer">
+                    <input type="hidden" id="styleInput" name="style" value="">
+
+                    <div class="form-group">
+                        <label for="name">Ваше имя *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Телефон *</label>
+                        <input type="tel" id="phone" name="phone" value="+7" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">Город</label>
+                        <input type="text" id="city" name="city">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Адрес</label>
+                        <input type="text" id="address" name="address">
+                    </div>
+
+                    <input type="hidden" name="_cc" value="sk-optima.stroy@mail.ru">
+                    <button type="submit" class="submit-btn">Получить консультацию</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const photoInput = document.getElementById('photoInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const formSection = document.getElementById('formSection');
+        const previewImg = document.getElementById('previewImg');
+        const styleInput = document.getElementById('styleInput');
+
+        photoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result;
+                    previewContainer.style.display = 'grid';
+                    formSection.style.display = 'block';
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updatePreview() {
+            const selectedStyle = document.querySelector('input[name="style"]:checked').value;
+            styleInput.value = selectedStyle;
+
+            const styles = {
+                gold: 'brightness(1) saturate(1.1) hue-rotate(-5deg)',
+                white: 'brightness(1.2) saturate(0.8) invert(0.1)',
+                blue: 'brightness(0.95) hue-rotate(200deg) saturate(1.3)',
+                mix: 'brightness(1.1) saturate(1.3) hue-rotate(25deg)'
+            };
+
+            previewImg.style.filter = styles[selectedStyle];
+        }
+
+        // Drag and drop
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--gold)';
+            uploadArea.style.background = 'rgba(26, 26, 26, 0.9)';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'var(--gold)';
+            uploadArea.style.background = 'rgba(15, 15, 15, 0.8)';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--gold)';
+            uploadArea.style.background = 'rgba(15, 15, 15, 0.8)';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                photoInput.files = files;
+                const event = new Event('change', { bubbles: true });
+                photoInput.dispatchEvent(event);
+            }
+        });
+    </script>
+</body>
+</html>
+```

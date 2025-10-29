@@ -1,0 +1,12 @@
+{
+  "name": "lumineux-visualizer",
+  "version": "1.0.0",
+  "description": "LUMINEUX Visualizer - Try before you buy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

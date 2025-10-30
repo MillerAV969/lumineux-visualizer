@@ -3,1556 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUMINEUX — Полный каталог новогодних украшений</title>
+    <title>LUMINEUX — Визуализатор украшений с проектами</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --gold: #FFD700; --dark: #0a0e1a; --light-dark: #141824; --white: #FFFFFF; --gray: #a0a8b8; }
+        :root { --gold: #FFD700; --dark-gold: #B8860B; --dark: #0a0e1a; --light-dark: #141824; --white: #FFFFFF; --gray: #a0a8b8; --snow: #E8F4F8; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cormorant Garamond', serif; background: linear-gradient(135deg, #0a0e1a 0%, #141824 50%, #1a1f33 100%); color: var(--white); line-height: 1.8; font-weight: 300; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
+        body { font-family: 'Cormorant Garamond', serif; background: linear-gradient(135deg, #0a0e1a 0%, #141824 50%, #1a1f33 100%); color: var(--white); line-height: 1.8; font-weight: 300; overflow-x: hidden; position: relative; }
         
-        header { background: linear-gradient(180deg, rgba(10, 14, 26, 0.95) 0%, rgba(20, 24, 36, 0.9) 100%); padding: 40px 30px; text-align: center; border-bottom: 2px solid rgba(255, 215, 0, 0.2); }
-        .logo { font-size: 42px; color: var(--gold); letter-spacing: 5px; text-transform: uppercase; }
-        .tagline { font-size: 18px; color: #E8F4F8; margin-top: 15px; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.05) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.03) 0%, transparent 40%); pointer-events: none; z-index: 0; }
         
-        .container { max-width: 1400px; margin: 0 auto; padding: 60px 30px; }
+        .starfield { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         
-        .catalog-section { margin-bottom: 80px; }
-        .section-title { font-size: 36px; color: var(--gold); margin-bottom: 40px; display: flex; align-items: center; gap: 15px; }
-        .section-emoji { font-size: 40px; }
+        .moon { position: fixed; top: 50px; right: 100px; width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500); border-radius: 50%; box-shadow: 0 0 40px rgba(255, 215, 0, 0.3); z-index: -1; }
         
-        .item-card { 
-            background: rgba(26, 31, 51, 0.6); 
-            padding: 30px; 
-            margin-bottom: 25px; 
-            border-radius: 12px; 
-            border-left: 4px solid var(--gold);
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 30px;
-            align-items: start;
-        }
+        .deco-tree { position: fixed; top: 80px; right: 50px; font-size: 120px; z-index: -1; opacity: 0.8; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); animation: sway 3s ease-in-out infinite; }
+        @keyframes sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(2deg); } }
         
-        .item-image {
-            width: 100%;
-            aspect-ratio: 1;
-            background: rgba(10, 14, 26, 0.8);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            overflow: hidden;
-        }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 600; }
         
-        .item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        header { background: linear-gradient(180deg, rgba(10, 14, 26, 0.95) 0%, rgba(20, 24, 36, 0.9) 100%); padding: 40px 30px; text-align: center; border-bottom: 2px solid rgba(255, 215, 0, 0.2); position: relative; z-index: 2; }
+        .logo { font-size: 42px; color: var(--gold); letter-spacing: 5px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        .tagline { font-size: 18px; color: var(--snow); margin-top: 15px; }
         
-        .item-image.empty {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: var(--gray);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 60px 30px; position: relative; z-index: 2; }
         
-        .item-image.empty:hover {
-            background: rgba(26, 31, 51, 0.9);
-            border-color: var(--gold);
-        }
+        .projects-panel { background: rgba(26, 31, 51, 0.8); padding: 30px; border-radius: 12px; margin-bottom: 40px; border: 2px solid rgba(255, 215, 0, 0.2); }
+        .projects-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; }
+        .projects-list { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
+        .project-btn { padding: 12px 20px; background: rgba(10, 14, 26, 0.8); border: 2px solid rgba(255, 215, 0, 0.3); color: var(--white); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+        .project-btn:hover { border-color: var(--gold); background: rgba(26, 31, 51, 0.9); }
+        .project-btn.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+        .add-project { padding: 12px 20px; background: transparent; border: 2px solid var(--gold); color: var(--gold); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .add-project:hover { background: var(--gold); color: var(--dark); }
         
-        .item-content h3 { font-size: 24px; color: var(--gold); margin-bottom: 15px; }
+        .project-info { padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--gold); }
+        .project-selections { font-size: 14px; color: var(--snow); line-height: 1.8; }
         
-        .item-details { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; 
-            margin-bottom: 20px;
-        }
+        .upload-section { background: linear-gradient(135deg, rgba(26, 31, 51, 0.6) 0%, rgba(20, 24, 36, 0.6) 100%); padding: 50px; border-radius: 12px; margin-bottom: 50px; border: 2px solid rgba(255, 215, 0, 0.15); box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5); }
         
-        .detail { padding: 12px; background: rgba(10, 14, 26, 0.6); border-radius: 6px; }
-        .detail-label { font-size: 12px; color: var(--gray); text-transform: uppercase; }
-        .detail-value { font-size: 15px; color: var(--white); margin-top: 5px; }
+        .preview-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; margin-top: 60px; align-items: flex-start; }
+        .preview-image { position: relative; overflow: hidden; border-radius: 12px; aspect-ratio: 4/3; background: var(--light-dark); border: 2px solid rgba(255, 215, 0, 0.2); box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5); }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.5s ease; }
         
-        .item-description { 
-            padding: 15px; 
-            background: rgba(255, 215, 0, 0.05); 
-            border-left: 3px solid var(--gold); 
-            border-radius: 6px;
-            color: var(--gray);
-            font-size: 14px;
-        }
+        .filters-panel { padding: 30px; background: rgba(26, 31, 51, 0.7); border-radius: 12px; max-height: 650px; overflow-y: auto; border: 1px solid rgba(255, 215, 0, 0.15); }
+        .category-section { margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid rgba(255, 215, 0, 0.1); }
+        .category-section:last-child { border-bottom: none; }
+        .category-title { font-size: 16px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         
-        .upload-hint {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-        }
+        .filter-option { display: flex; align-items: center; padding: 14px; margin-bottom: 10px; background: rgba(10, 14, 26, 0.6); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; }
+        .filter-option:hover { border-color: var(--gold); background: rgba(26, 31, 51, 0.8); transform: translateX(5px); }
+        .filter-option input { width: 20px; height: 20px; cursor: pointer; margin-right: 14px; accent-color: var(--gold); }
+        .filter-label { font-size: 15px; color: var(--snow); flex: 1; display: flex; align-items: center; }
+        .filter-label img { width: 40px; height: 40px; border-radius: 6px; margin-right: 12px; object-fit: cover; border: 1px solid rgba(255, 215, 0, 0.3); }
         
-        .upload-icon { font-size: 40px; }
-        .upload-text { font-size: 12px; color: var(--gray); margin-top: 10px; }
+        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .btn { padding: 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+        .btn-add { background: rgba(255, 215, 0, 0.2); color: var(--gold); border: 2px solid var(--gold); }
+        .btn-add:hover { background: var(--gold); color: var(--dark); }
+        .btn-view { background: rgba(70, 130, 180, 0.3); color: #87CEEB; border: 2px solid #87CEEB; }
+        .btn-view:hover { background: #87CEEB; color: var(--dark); }
+        .btn-send { background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%); color: var(--dark); border: none; width: 100%; }
+        .btn-send:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5); }
         
-        @media (max-width: 768px) {
-            .item-card { grid-template-columns: 1fr; }
-            .item-image { aspect-ratio: auto; height: 250px; }
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--light-dark); padding: 40px; border-radius: 12px; max-width: 500px; border: 2px solid var(--gold); }
+        .modal-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; }
+        .modal-input { width: 100%; padding: 12px; background: rgba(10, 14, 26, 0.8); border: 1px solid rgba(255, 215, 0, 0.3); color: var(--white); border-radius: 6px; margin-bottom: 20px; font-size: 16px; }
+        .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(10, 14, 26, 0.5); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 5px; }
+        
+        @media (max-width: 1024px) { .preview-container { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .container { padding: 30px 15px; } .projects-list { flex-wrap: wrap; } }
     </style>
 </head>
 <body>
+    <!-- ЗВЕЗДНОЕ НЕБО -->
+    <div class="starfield" id="starfield"></div>
+    <div class="moon"></div>
+    <div class="deco-tree">🎄</div>
+    
     <header>
         <div class="logo">✨ Lumineux ✨</div>
-        <p class="tagline">Полный каталог новогодних украшений</p>
+        <p class="tagline">🎄 Создавайте проекты: примеряйте украшения, комбинируйте, отправляйте в работу</p>
     </header>
 
     <div class="container">
-        <!-- РАЗДЕЛ 1: ГИРЛЯНДЫ -->
-        <div class="catalog-section">
-            <h2 class="section-title">
-                <span class="section-emoji">💡</span>
-                Гирлянды для дома
-            </h2>
-            
-            <!-- БАХРОМА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'fringe-white.jpg')" id="img-fringe-white">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>fringe-white.jpg</div>
-                    </div>
+        <!-- ПАНЕЛЬ ПРОЕКТОВ -->
+        <div class="projects-panel">
+            <div class="projects-title">📋 Ваши проекты</div>
+            <div class="projects-list" id="projectsList"></div>
+            <button class="add-project" onclick="createNewProject()">+ Новый проект</button>
+        </div>
+
+        <!-- ИНФОРМАЦИЯ О ПРОЕКТЕ -->
+        <div class="project-info" id="projectInfo">
+            <div style="font-size: 14px; color: var(--gray); margin-bottom: 10px;">📝 ВЫБРАННЫЕ УКРАШЕНИЯ:</div>
+            <div class="project-selections" id="projectSelections">
+                (Выберите украшения для проекта)
+            </div>
+        </div>
+
+        <!-- ЗАГРУЗКА ФОТО -->
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('photoInput').click()" id="uploadArea">
+                <div style="font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));">📸</div>
+                <div style="font-size: 24px; color: var(--gold); margin-bottom: 12px; font-weight: 600;">Загрузите фото вашего дома</div>
+                <div style="font-size: 16px; color: var(--gray);">Сфотографируйте или выберите из галереи</div>
+                <input type="file" id="photoInput" style="display: none;" accept="image/*" capture="environment">
+            </div>
+
+            <div class="preview-container" id="previewContainer" style="display: none;">
+                <div class="preview-image">
+                    <img id="previewImg" class="preview-img" src="" alt="Preview">
                 </div>
-                <div class="item-content">
-                    <h3>Бахрома (сосульки)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">LED сосульки, падающие свет</div>
+
+                <div class="filters-panel">
+                    <!-- ГИРЛЯНДЫ -->
+                    <div class="category-section">
+                        <div class="category-title">
+                            <span>💡</span> Гирлянды
                         </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">Белый, тёплый, холодный</div>
+                        
+                        <div class="filter-option">
+                            <input type="checkbox" id="garland-fringe-white" name="garland" value="Бахрома белая" onchange="updateProject()">
+                            <label for="garland-fringe-white" class="filter-label">
+                                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/c0ca66f8-2da5-4fe2-be6c-62b09ff50f74.png">
+                                Бахрома белая
+                            </label>
                         </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Край крыши, фасад</div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="garland-fringe-yellow" name="garland" value="Бахрома жёлтая" onchange="updateProject()">
+                            <label for="garland-fringe-yellow" class="filter-label">
+                                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/b66a3a68-0cfe-4e85-aaa6-3db6a1859dc1.png">
+                                Бахрома жёлтая
+                            </label>
                         </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">5-15 тыс</div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="garland-neon-white" name="garland" value="Дюролайт белый" onchange="updateProject()">
+                            <label for="garland-neon-white" class="filter-label">
+                                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/ac2cb769-abe5-4315-b494-33da9edfe56a.png">
+                                Дюролайт белый
+                            </label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="garland-neon-yellow" name="garland" value="Дюролайт жёлтый" onchange="updateProject()">
+                            <label for="garland-neon-yellow" class="filter-label">
+                                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/22a24c4e-f6d0-4474-b593-6319f1874cec.png">
+                                Дюролайт жёлтый
+                            </label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="garland-beltlight" name="garland" value="Белтлайт" onchange="updateProject()">
+                            <label for="garland-beltlight" class="filter-label">
+                                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/0a7bc676-68bc-4580-ac19-9004c6f58875.png">
+                                Белтлайт
+                            </label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
                         </div>
                     </div>
-                    <div class="item-description">
-                        Классический вариант для создания праздничной атмосферы. Идеальна для оформления края крыши и боковых поверхностей дома. Легко устанавливается и снимается.
+
+                    <!-- ЁЛКИ -->
+                    <div class="category-section">
+                        <div class="category-title">
+                            <span>🎄</span> Ёлки
+                        </div>
+                        
+                        <div class="filter-option">
+                            <input type="checkbox" id="tree-3m" name="tree" value="Ёлка 3м золото" onchange="updateProject()">
+                            <label for="tree-3m" class="filter-label">Ёлка 3м (золото)</label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="tree-5m" name="tree" value="Ёлка 5м белая" onchange="updateProject()">
+                            <label for="tree-5m" class="filter-label">Ёлка 5м (белая)</label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="tree-8m" name="tree" value="Ёлка 8м микс" onchange="updateProject()">
+                            <label for="tree-8m" class="filter-label">Ёлка 8м (микс)</label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                        </div>
+                    </div>
+
+                    <!-- ВХОДНЫЕ ГРУППЫ -->
+                    <div class="category-section">
+                        <div class="category-title">
+                            <span>🚪</span> Входные группы
+                        </div>
+                        
+                        <div class="filter-option">
+                            <input type="checkbox" id="entrance-wreath" name="entrance" value="Венок LED" onchange="updateProject()">
+                            <label for="entrance-wreath" class="filter-label">Венок LED</label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="entrance-arch" name="entrance" value="Световая арка" onchange="updateProject()">
+                            <label for="entrance-arch" class="filter-label">Световая арка</label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                        </div>
+                    </div>
+
+                    <!-- ФИГУРЫ -->
+                    <div class="category-section">
+                        <div class="category-title">
+                            <span>🦌</span> Фигуры
+                        </div>
+                        
+                        <div class="filter-option">
+                            <input type="checkbox" id="figure-deer" name="figure" value="Олени LED" onchange="updateProject()">
+                            <label for="figure-deer" class="filter-label">Олени LED</label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="figure-santa" name="figure" value="Санта с санями" onchange="updateProject()">
+                            <label for="figure-santa" class="filter-label">Санта с санями</label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="figure-snowman" name="figure" value="Снеговик LED" onchange="updateProject()">
+                            <label for="figure-snowman" class="filter-label">Снеговик LED</label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                        </div>
+                    </div>
+
+                    <!-- ПОДСВЕТКА ДЕРЕВЬЕВ -->
+                    <div class="category-section">
+                        <div class="category-title">
+                            <span>🌲</span> Подсветка деревьев
+                        </div>
+                        
+                        <div class="filter-option">
+                            <input type="checkbox" id="tree-light-gold" name="tree-light" value="Золотая обмотка" onchange="updateProject()">
+                            <label for="tree-light-gold" class="filter-label">Золотая обмотка</label>
+                        </div>
+
+                        <div class="filter-option">
+                            <input type="checkbox" id="tree-light-cascade" name="tree-light" value="Каскадная подсветка" onchange="updateProject()">
+                            <label for="tree-light-cascade" class="filter-label">Каскадная подсветка</label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ДЮРОЛАЙТ НИТЬ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'neon-durolite.jpg')" id="img-neon-durolite">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>neon-durolite.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Дюролайт нить (неон)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Гибкий неон-шнур с LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">Белый, жёлтый, красный</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Контур здания, стены</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">3-8 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Гибкий неоновый шнур позволяет создавать изящные контуры. Идеален для обвязки оконных проёмов, углов и дверных арок. Яркий, энергосберегающий вариант.
-                    </div>
-                </div>
+            <!-- КНОПКА ОТПРАВКИ -->
+            <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" id="sendButtonContainer" style="display: none;">
+                <button class="btn" style="background: rgba(70, 130, 180, 0.3); color: #87CEEB; border: 2px solid #87CEEB; cursor: pointer;" onclick="downloadProjectSummary()">📥 Скачать проект</button>
+                <button class="btn btn-send" onclick="sendProject()">✉️ Отправить проект в работу</button>
             </div>
+        </div>
+    </div>
 
-            <!-- БЕЛТЛАЙТ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'beltlight.jpg')" id="img-beltlight">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>beltlight.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Белтлайт</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Плотная гирлянда с лампочками</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">Тёплый, холодный белый</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Обвязка контура</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">4-10 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Профессиональный вариант для равномерного освещения контура здания. Расстояние между лампочками создаёт классический праздничный вид. Долговечен и надёжен.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СЕТКА LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'led-grid.jpg')" id="img-led-grid">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>led-grid.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Сетка LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Сетка с встроенными LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">Белый, многоцветный</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">На стены, углы зданий</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">6-12 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Покрывает большие площади равномерным светом. Идеальна для фасадов, стен и углов. Создаёт впечатление полного светового покрытия поверхности.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ЗАНАВЕС СВЕТОВОЙ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'light-curtain.jpg')" id="img-light-curtain">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>light-curtain.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Занавес световой</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Плотный занавес из ниток света</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">Холодный, тёплый</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Фасад дома, входная группа</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">8-20 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Создаёт впечатляющий эффект водопада света. Идеален для оформления входной группы и фасадов. Видим во всё расстояние благодаря плотности ниток.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СВЕТОВОЙ ШНУР -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'light-rope.jpg')" id="img-light-rope">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>light-rope.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Световой шнур</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Мягкий кабель с LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">Все цвета</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Элементы дизайна, контуры</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">2-5 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Универсальный вариант для создания акцентных элементов. Гибкость позволяет изгибать под нужным углом. Экономичен и практичен для деталей оформления.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ЛЕНТА LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'led-tape.jpg')" id="img-led-tape">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>led-tape.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Лента LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Тонкая гибкая лента со встроенным LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">RGB, одноцветная</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Детали, волны</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">1-3 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Самая тонкая и гибкая из всех вариантов. Идеальна для подчёркивания архитектурных деталей и создания волнообразных узоров. Экономный вариант для акцентов.
-                    </div>
-                </div>
-            </div>
-
-            <!-- БЕГУЩАЯ ВОЛНА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'wave-effect.jpg')" id="img-wave-effect">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>wave-effect.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Бегущая волна (программируемый эффект)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Программируемый эффект движения света</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цвета</div>
-                            <div class="detail-value">RGB (многоцветная)</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Применение</div>
-                            <div class="detail-value">Фасады, крыши</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">10-25 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Премиум вариант с динамическими эффектами. Свет "бежит" волной по контуру здания. Управляется через контроллер. Создаёт впечатляющий визуальный эффект.
-                    </div>
-                </div>
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-title">📋 Название проекта</div>
+            <input type="text" id="projectNameInput" class="modal-input" placeholder="Например: 'Дом с гирляндами и ёлкой'">
+            <div class="modal-buttons">
+                <button class="btn" style="background: rgba(100,100,100,0.5); border: none; color: var(--white);" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-send" onclick="confirmProjectName()">Создать</button>
             </div>
         </div>
     </div>
 
     <script>
-        function uploadImage(element, filename) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        element.innerHTML = `<img src="${event.target.result}" alt="preview">`;
-                        element.classList.remove('empty');
-                        console.log(`Фото для ${filename} загружено`);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
+        // ЗВЕЗДЫ
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 60 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starfield.appendChild(star);
+            }
         }
-    </script>
-</body>
-</html>
-        <!-- РАЗДЕЛ 2: КАРКАСНЫЕ ЁЛКИ -->
-        <div class="catalog-section">
-            <h2 class="section-title">
-                <span class="section-emoji">🎄</span>
-                Каркасные ёлки
-            </h2>
-            
-            <!-- 2-3 МЕТРА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-2-3m.jpg')" id="img-tree-2-3m">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-2-3m.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка 2-3 метра</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Компактная каркасная ёлка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Классическая, конус</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">LED встроен или отдельно</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">15-30 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Идеальна для небольших участков и входных групп. Легко устанавливается за 1-2 часа. Прекрасно смотрится как самостоятельный элемент или в композиции с другими украшениями.
-                    </div>
-                </div>
-            </div>
+        createStarfield();
 
-            <!-- 4-5 МЕТРОВ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-4-5m.jpg')" id="img-tree-4-5m">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-4-5m.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка 4-5 метров</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Средняя каркасная ёлка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Конус, расширяющаяся</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">Многоцветный, одноцветный</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">35-60 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Самый популярный размер для частных домов и небольших коммерческих объектов. Хорошо видна издалека. Требует небольшого пространства для установки.
-                    </div>
-                </div>
-            </div>
+        // ДАННЫЕ ПРОЕКТОВ
+        let projects = JSON.parse(localStorage.getItem('projects')) || [];
+        let currentProjectId = null;
+        let tempSelection = {};
 
-            <!-- 6-8 МЕТРОВ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-6-8m.jpg')" id="img-tree-6-8m">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-6-8m.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка 6-8 метров</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Большая премиум ёлка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Конус премиум с красивым обликом</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">RGB контроллер</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">80-150 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Производит впечатляющий эффект. Хорошо видна с большого расстояния. Требует профессиональной установки. Становится центральным элементом праздничного оформления.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 10-12 МЕТРОВ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-10-12m.jpg')" id="img-tree-10-12m">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-10-12m.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка 10-12 метров</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Очень большая профессиональная ёлка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Профессиональная с усиленным каркасом</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">Динамические эффекты</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">200-400 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Для крупных объектов и главных площадей. Видна издалека на несколько кварталов. Требует профессиональной команды и специального оборудования для установки.
-                    </div>
-                </div>
-            </div>
-
-            <!-- 14-18 МЕТРОВ ГИГАНТСКАЯ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-14-18m.jpg')" id="img-tree-14-18m">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-14-18m.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка 14-18 метров (Гигантская)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Гигантская эксклюзивная ёлка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Эксклюзив с индивидуальным дизайном</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">Полная автоматизация</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">500-1,000 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Уникальное произведение искусства. Видима с расстояния в несколько км. Требует сложного проектирования, подготовки грунта и специальной техники. Становится символом города.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СПИРАЛЬ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-spiral.jpg')" id="img-tree-spiral">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-spiral.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка-спираль (3-6м)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Спиралевидная конструкция</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">3-6 метров различных диаметров</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">Встроенный LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">25-50 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Оригинальный современный вариант. Требует меньше пространства, чем классическая ёлка. Идеальна для узких проходов, входных групп и современных минималистичных дизайнов.
-                    </div>
-                </div>
-            </div>
-
-            <!-- МОДУЛЬНАЯ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-modular.jpg')" id="img-tree-modular">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-modular.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка модульная (2-12м)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Собираемые секции для гибкости</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Различные высоты из модулей</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Свет</div>
-                            <div class="detail-value">Настраиваемый</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">40-80 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Универсальное решение. Можно собрать любую высоту из готовых модулей. Легче всего хранить и перевозить. Экономит время на установку за счёт готовых секций.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- РАЗДЕЛ 3: ВХОДНЫЕ ГРУППЫ -->
-        <div class="catalog-section">
-            <h2 class="section-title">
-                <span class="section-emoji">🚪</span>
-                Входные группы (оформление дверей)
-            </h2>
-            
-            <!-- ВЕНОК -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'wreath-classic.jpg')" id="img-wreath-classic">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>wreath-classic.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Венок классический</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Классический рождественский венок</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">30-60см, красный, зелёный</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">Пластик, имитация хвои</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">3-10 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Вечная классика. Прекрасно смотрится на двери или стене. Экономичный вариант для быстрого оформления входной группы. Легко прикрепляется крючком.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ВЕНОК LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'wreath-led.jpg')" id="img-wreath-led">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>wreath-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Венок LED (с подсветкой)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Венок со встроенной подсветкой</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Различные диаметры 40-70см</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">Пластик + LED гирлянда</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">5-15 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Модернизированный вариант классического венка. Светится в тёмное время суток. Создаёт дополнительный праздничный эффект. Требует электропитания рядом.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ГИРЛЯНДА В ДВЕРЬ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'garland-door.jpg')" id="img-garland-door">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>garland-door.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Гирлянда в дверь</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Гирлянда по контуру дверного проёма</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Одинарная, двойная обвязка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">LED нить разной длины</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">4-12 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Подчёркивает архитектуру двери. Можно обвить один или два раза для большей плотности. Создаёт праздничный портал входа в дом.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СВЕТОВАЯ АРКА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'light-arch.jpg')" id="img-light-arch">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>light-arch.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Световая арка</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Арка из LED над входом</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">2-4 метра ширины</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">Гибкая LED лента на каркасе</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">15-35 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Создаёт впечатляющий эффект входного портала. Видна издалека. Требует установки специального каркаса. Полностью преображает входную зону.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ПОЛНАЯ ИНСТАЛЛЯЦИЯ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'entrance-full.jpg')" id="img-entrance-full">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>entrance-full.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Полная инсталляция входной группы</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Комплекс: венок + гирлянда + фигуры</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">Люкс оформление входной группы</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">Комбинированный комплекс</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">30-80 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Премиум вариант. Включает все элементы в единой стилистике. Профессиональное оформление входа. Требует консультации дизайнера для гармоничного сочетания элементов.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ЁЛКА В ГОРШКЕ LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-pot-led.jpg')" id="img-tree-pot-led">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-pot-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлка в горшке с LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Мини-ёлка со встроенной подсветкой</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">0,5-1 метр, помещается на входе</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">Пластик с горшком</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">2-5 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Компактное и недорогое решение. Идеальна для квартир, офисов и магазинов. Создаёт праздничное настроение в ограниченном пространстве.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ФИГУРЫ НА ВХОДЕ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'entrance-figures.jpg')" id="img-entrance-figures">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>entrance-figures.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Фигуры на входе</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Олени, снеговики, Санта LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Варианты</div>
-                            <div class="detail-value">0,5-2м высоты, разные персонажи</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Материал</div>
-                            <div class="detail-value">Проволочные каркасы с подсветкой</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">8-30 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Привлекает внимание и создаёт волшебную атмосферу. Идеальны для создания праздничного настроения у входа. Могут быть установлены по обе стороны от двери.
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- РАЗДЕЛ 4: СВЕТОВЫЕ ФИГУРЫ -->
-        <div class="catalog-section">
-            <h2 class="section-title">
-                <span class="section-emoji">🦌</span>
-                Световые фигуры
-            </h2>
-            
-            <!-- ОЛЕНЬ LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-deer-led.jpg')" id="img-figure-deer">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-deer-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Олень LED (3D светящийся)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">3D олень с подсветкой LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,6-2м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Статичный или мигающий</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">5-20 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Символ Рождества. Идеален для входной группы или центра участка. Часто используется в композициях из нескольких оленей. Видим издалека даже в тёмное время.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СЕМЬЯ ОЛЕНЕЙ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-deer-family.jpg')" id="img-figure-deer-family">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-deer-family.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Семья оленей (композиция)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Несколько оленей разных высот</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,5-1,5м, 3-4 фигуры</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Разные высоты для глубины</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">15-40 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Рассказывает историю Санты с оленями. Создаёт динамичную композицию. Требует больше пространства, но смотрится впечатляюще на больших участках.
-                    </div>
-                </div>
-            </div>
-
-            <!-- МЕДВЕДЬ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-bear-led.jpg')" id="img-figure-bear">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-bear-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Медведь LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Объёмный медведь со светом</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,5-1,5м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Мигающий свет</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">8-18 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Добавляет необычности новогоднему оформлению. Часто используется в парах - медведь и олень. Привлекает внимание своей оригинальностью.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СНЕГОВИК LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-snowman-led.jpg')" id="img-figure-snowman">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-snowman-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Снеговик LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Классический снеговик со встроенным LED</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,5-2м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Статичный свет</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">4-15 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Излюбленный символ зимы. Идеален для семей с детьми. Создаёт уютную атмосферу. Часто устанавливается рядом с входной дверью или в центре участка.
-                    </div>
-                </div>
-            </div>
-
-            <!-- САНТА КЛАУС -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-santa-led.jpg')" id="img-figure-santa">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-santa-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Санта Клаус LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Фигура Деда Мороза/Санты со светом</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,8-1,5м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">С мигающим лицом</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">10-25 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Главный персонаж праздника. Часто становится центральной фигурой оформления. Мигающее лицо добавляет интерактивности. Рекомендуется в центр внимания участка.
-                    </div>
-                </div>
-            </div>
-
-            <!-- САНТА С САНЯМИ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-santa-sleigh.jpg')" id="img-figure-santa-sleigh">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-santa-sleigh.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Санта с санями и оленями</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Комплекс Санта + олени + сани</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">2-4м композиция</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Динамический свет</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">30-80 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Премиум вариант. Рассказывает полную историю Рождества. Требует много места. Становится главной достопримечательностью участка. Видима издалека.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ЁЛОЧКА LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-tree-led.jpg')" id="img-figure-tree">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-tree-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Ёлочка LED (мини-ёлка светящаяся)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Мини-ёлка со встроенной подсветкой</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,3-0,8м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Разноцветная или одноцветная</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">2-8 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Компактный вариант для украшения входных ступеней. Можно использовать множество для создания эффекта лесочка. Экономичное решение для создания атмосферы.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ГЕОМЕТРИЧЕСКИЕ СФЕРЫ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-spheres-led.jpg')" id="img-figure-spheres">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-spheres-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Геометрические сферы LED</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Шары, кубы, пирамиды светящиеся</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,5-2м различные формы</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">RGB свет многоцветный</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">8-25 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Современный минималистичный вариант. Идеален для создания скульптурных композиций. Может использоваться как отдельно, так и в группах. Подходит для современных интерьеров.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ПОДАРКИ LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-gifts-led.jpg')" id="img-figure-gifts">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-gifts-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Подарки LED (светящиеся коробки)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Светящиеся коробки подарков</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,3-1м различные размеры</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Цветной или одноцветный свет</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">5-15 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Символизирует щедрость Рождества. Часто используется в группах для создания эффекта подарочной груды. Идеальны для входных групп и праздничных зон.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СВЕЧИ LED -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-candles-led.jpg')" id="img-figure-candles">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-candles-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Свечи LED (декоративные светящиеся)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Декоративные светящиеся свечи</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">0,2-0,5м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Статичный теплый свет</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">1-3 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Самый экономичный вариант. Идеален для создания мягкого, теплого освещения. Часто используется на ступенях, в оконных проёмах или вдоль дорожек. Безопасны для домов с детьми.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ФОНТАН СВЕТА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'figure-fountain-led.jpg')" id="img-figure-fountain">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>figure-fountain-led.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Фонтан света (каскадная подсветка)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Каскадная подсветка, водопад света</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Размеры</div>
-                            <div class="detail-value">1-3м высота</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Эффект водопада света сверху вниз</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">15-40 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Впечатляющий динамичный эффект. Часто становится центральным элементом оформления. Требует крепления на высоте. Видим издалека благодаря движению света.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- РАЗДЕЛ 5: ПОДСВЕТКА ДЕРЕВЬЕВ НА УЧАСТКЕ -->
-        <div class="catalog-section">
-            <h2 class="section-title">
-                <span class="section-emoji">🌲</span>
-                Подсветка деревьев на участке
-            </h2>
-            
-            <!-- ОБМОТКА ГИРЛЯНДОЙ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-wrap-garland.jpg')" id="img-tree-wrap-garland">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-wrap-garland.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Обмотка гирляндой (спираль)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Спиралевидная обмотка вокруг ствола</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-value">Простая установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Мягкое, ровное свечение</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">2-5 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Простой и доступный способ. Идеален для домашней установки без специалистов. Требует 2-3 часа работы. Выглядит элегантно и стильно.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СЕТКА НА ЁЛКУ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-net.jpg')" id="img-tree-net">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-net.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Сетка LED на ёлку</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">LED сетка обвивает ветви дерева</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-value">Средняя установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Равномерный свет по всей кроне</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">3-8 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Покрывает большую площадь равномерно. Создаёт впечатление полного светового облака. Подходит для деревьев средней и большой высоты.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ПРОЖЕКТОРНАЯ ПОДСВЕТКА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-spotlight.jpg')" id="img-tree-spotlight">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-spotlight.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Прожекторная подсветка</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Прожектор направлен снизу на дерево</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-value">Средняя установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Контрастный, драматичный свет</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">5-15 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Создаёт сильный визуальный эффект. Подходит для высоких деревьев. Видима издалека. Требует установки электросети рядом с деревом.
-                    </div>
-                </div>
-            </div>
-
-            <!-- СПОТОВАЯ ПОДСВЕТКА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-multi-spot.jpg')" id="img-tree-multi-spot">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-multi-spot.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Спотовая подсветка (несколько источников)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Несколько прожекторов вокруг дерева</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-label">Сложная установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Профессиональный вид</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">10-25 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Премиум решение. Использует несколько источников света для равномерного освещения. Требует профессиональной установки электросети. Выглядит как музейное освещение.
-                    </div>
-                </div>
-            </div>
-
-            <!-- КАСКАДНАЯ ПОДСВЕТКА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-cascade.jpg')" id="img-tree-cascade">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-cascade.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Каскадная подсветка (водопад света)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Ниточки света сверху вниз</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-label">Сложная установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Впечатляющий водопад света</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">8-20 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Самый красивый и впечатляющий вариант. Требует крепления на верхушке дерева. Видима издалека благодаря динамичному эффекту. Становится главной достопримечательностью.
-                    </div>
-                </div>
-            </div>
-
-            <!-- RGB СИСТЕМА -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-rgb.jpg')" id="img-tree-rgb">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-rgb.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>RGB система (программируемая подсветка)</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">Программируемая многоцветная подсветка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-label">Очень сложная установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Динамические цветовые эффекты</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">20-60 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Инновационное решение. Управляется через контроллер или приложение. Может менять цвета и эффекты. Требует профессиональной установки и настройки программирования.
-                    </div>
-                </div>
-            </div>
-
-            <!-- ВСТРОЕННАЯ В ВЕТВИ -->
-            <div class="item-card">
-                <div class="item-image empty" onclick="uploadImage(this, 'tree-embedded.jpg')" id="img-tree-embedded">
-                    <div class="upload-hint">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Загрузить фото<br>tree-embedded.jpg</div>
-                    </div>
-                </div>
-                <div class="item-content">
-                    <h3>Встроенная в ветви подсветка</h3>
-                    <div class="item-details">
-                        <div class="detail">
-                            <div class="detail-label">Описание</div>
-                            <div class="detail-value">LED встроен в основание каждой ветки</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Сложность</div>
-                            <div class="detail-label">Очень сложная установка</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Эффект</div>
-                            <div class="detail-value">Люминесцентный эффект ветвей</div>
-                        </div>
-                        <div class="detail">
-                            <div class="detail-label">Цена</div>
-                            <div class="detail-value">15-50 тыс</div>
-                        </div>
-                    </div>
-                    <div class="item-description">
-                        Премиум экспресс решение. Создаёт эффект светящихся ветвей. Требует особой подготовки дерева. Выглядит как волшебство. Требует профессиональной команды для установки.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function uploadImage(element, filename) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        element.innerHTML = `<img src="${event.target.result}" alt="preview">`;
-                        element.classList.remove('empty');
-                        console.log(`Фото для ${filename} загружено`);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
+        function renderProjects() {
+            const list = document.getElementById('projectsList');
+            list.innerHTML = '';
+            projects.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `project-btn ${currentProjectId === p.id ? 'active' : ''}`;
+                btn.textContent = `${p.name} (${p.selections.length})`;
+                btn.onclick = () => selectProject(p.id);
+                list.appendChild(btn);
+            });
         }
+
+        function createNewProject() {
+            document.getElementById('projectModal').classList.add('active');
+            document.getElementById('projectNameInput').value = '';
+        }
+
+        function confirmProjectName() {
+            const name = document.getElementById('projectNameInput').value.trim();
+            if (!name) { alert('Введите название'); return; }
+            
+            const project = {
+                id: Date.now(),
+                name: name,
+                selections: [],
+                photo: null
+            };
+            projects.push(project);
+            currentProjectId = project.id;
+            saveProjects();
+            renderProjects();
+            closeModal();
+            updateProjectInfo();
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+        }
+
+        function selectProject(id) {
+            currentProjectId = id;
+            renderProjects();
+            updateProjectInfo();
+            tempSelection = {};
+            clearCheckboxes();
+        }
+
+        function addSelectionToProject() {
+            if (!currentProjectId) { alert('Создайте проект'); return; }
+            
+            const selected = getSelectedItems();
+            if (selected.length === 0) { alert('Выберите украшение'); return; }
+            
+            const project = projects.find(p => p.id === currentProjectId);
+            project.selections.push(...selected);
+            saveProjects();
+            updateProjectInfo();
+            clearCheckboxes();
+        }
+
+        function viewSeparate() {
+            const selected = getSelectedItems();
+            if (selected.length === 0) { alert('Выберите украшение'); return; }
+            alert(`Просмотр отдельно:\n\n${selected.join('\n')}`);
+        }
+
+        function getSelectedItems() {
+            const items = [];
+            document.querySelectorAll('.filter-option input:checked').forEach(cb => {
+                items.push(cb.value);
+            });
+            return items;
+        }
+
+        function clearCheckboxes() {
+            document.querySelectorAll('.filter-option input:checked').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
+        function updateProject() {
+            document.getElementById('sendButtonContainer').style.display = currentProjectId ? 'grid' : 'none';
+        }
+
+        function updateProjectInfo() {
+            if (!currentProjectId) return;
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+            
+            const info = document.getElementById('projectSelections');
+            if (project.selections.length === 0) {
+                info.innerHTML = '(Выберите украшения для проекта)';
+            } else {
+                info.innerHTML = project.selections.map((s, i) => `${i+1}. ${s}`).join('<br>');
+            }
+        }
+
+        function sendProject() {
+            if (!currentProjectId) { alert('Выберите проект'); return; }
+            const project = projects.find(p => p.id === currentProjectId);
+            
+            const message = `Новый проект: "${project.name}"\n\nУкрашения:\n${project.selections.map(s => '• ' + s).join('\n')}`;
+            alert('✉️ Проект отправлен!\n\n' + message);
+        }
+
+        function downloadProjectSummary() {
+            if (!currentProjectId) { alert('Выберите проект'); return; }
+            const project = projects.find(p => p.id === currentProjectId);
+            
+            const summary = `ПРОЕКТ: ${project.name}\n\nУКРАШЕНИЯ:\n${project.selections.map((s, i) => `${i+1}. ${s}`).join('\n')}`;
+            const blob = new Blob([summary], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${project.name}.txt`;
+            a.click();
+        }
+
+        function saveProjects() {
+            localStorage.setItem('projects', JSON.stringify(projects));
+        }
+
+        // ФОТО
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('previewImg').src = event.target.result;
+                    document.getElementById('previewContainer').style.display = 'grid';
+                    document.getElementById('sendButtonContainer').style.display = 'grid';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        renderProjects();
     </script>
 </body>
 </html>

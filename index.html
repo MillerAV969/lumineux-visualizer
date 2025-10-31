@@ -32,10 +32,12 @@
         
         .projects-panel { background: rgba(26, 31, 51, 0.8); padding: 30px; border-radius: 12px; margin-bottom: 40px; border: 2px solid rgba(255, 215, 0, 0.2); }
         .projects-title { font-size: 24px; color: var(--gold); margin-bottom: 20px; }
-        .projects-list { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
-        .project-btn { padding: 12px 20px; background: rgba(10, 14, 26, 0.8); border: 2px solid rgba(255, 215, 0, 0.3); color: var(--white); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+        .projects-list { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; flex-wrap: wrap; }
+        .project-btn { padding: 12px 20px; background: rgba(10, 14, 26, 0.8); border: 2px solid rgba(255, 215, 0, 0.3); color: var(--white); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; position: relative; }
         .project-btn:hover { border-color: var(--gold); background: rgba(26, 31, 51, 0.9); }
         .project-btn.active { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+        .project-btn .delete-btn { position: absolute; right: -8px; top: -8px; background: #ff4444; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 12px; color: white; border: none; }
+        .project-btn:hover .delete-btn { display: flex; }
         .add-project { padding: 12px 20px; background: transparent; border: 2px solid var(--gold); color: var(--gold); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
         .add-project:hover { background: var(--gold); color: var(--dark); }
         
@@ -43,6 +45,12 @@
         .project-selections { font-size: 14px; color: var(--snow); line-height: 1.8; }
         
         .upload-section { background: linear-gradient(135deg, rgba(26, 31, 51, 0.6) 0%, rgba(20, 24, 36, 0.6) 100%); padding: 50px; border-radius: 12px; margin-bottom: 50px; border: 2px solid rgba(255, 215, 0, 0.15); box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5); }
+        
+        .gallery-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin: 30px 0; max-height: 400px; overflow-y: auto; }
+        .gallery-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255, 215, 0, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item:hover { border-color: var(--gold); transform: scale(1.05); }
+        .gallery-item .remove-photo { position: absolute; top: 5px; right: 5px; background: #ff4444; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; border: none; }
         
         .preview-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; margin-top: 60px; align-items: flex-start; }
         .preview-image { position: relative; overflow: hidden; border-radius: 12px; aspect-ratio: 4/3; background: var(--light-dark); border: 2px solid rgba(255, 215, 0, 0.2); box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5); }
@@ -68,6 +76,9 @@
         .btn-send { background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%); color: var(--dark); border: none; width: 100%; }
         .btn-send:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5); }
         
+        .action-container { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .action-container.hidden { display: none; }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: var(--light-dark); padding: 40px; border-radius: 12px; max-width: 500px; border: 2px solid var(--gold); }
@@ -75,12 +86,24 @@
         .modal-input { width: 100%; padding: 12px; background: rgba(10, 14, 26, 0.8); border: 1px solid rgba(255, 215, 0, 0.3); color: var(--white); border-radius: 6px; margin-bottom: 20px; font-size: 16px; }
         .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
+        .waiting-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .waiting-modal.active { display: flex; }
+        .waiting-content { background: linear-gradient(135deg, rgba(10, 14, 26, 0.95) 0%, rgba(20, 24, 36, 0.95) 100%); padding: 60px 40px; border-radius: 20px; text-align: center; border: 3px solid var(--gold); max-width: 600px; box-shadow: 0 0 60px rgba(255, 215, 0, 0.3); }
+        .waiting-title { font-size: 48px; color: var(--gold); margin-bottom: 30px; text-transform: uppercase; letter-spacing: 3px; }
+        .waiting-subtitle { font-size: 20px; color: var(--snow); margin-bottom: 40px; line-height: 1.6; }
+        .spinner { width: 60px; height: 60px; border: 4px solid rgba(255, 215, 0, 0.2); border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .phone-number { font-size: 32px; color: var(--gold); font-weight: 600; letter-spacing: 2px; margin: 30px 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        .phone-description { font-size: 16px; color: var(--gray); margin-top: 25px; line-height: 1.8; }
+        .result-image { margin-top: 40px; max-width: 100%; border-radius: 12px; border: 2px solid rgba(255, 215, 0, 0.3); }
+        .close-result { margin-top: 30px; }
+        
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: rgba(10, 14, 26, 0.5); }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 5px; }
         
         @media (max-width: 1024px) { .preview-container { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .container { padding: 30px 15px; } .projects-list { flex-wrap: wrap; } }
+        @media (max-width: 768px) { .container { padding: 30px 15px; } .projects-list { flex-wrap: wrap; } .gallery-container { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); } .waiting-title { font-size: 32px; } .phone-number { font-size: 24px; } }
     </style>
 </head>
 <body>
@@ -103,7 +126,7 @@
         </div>
 
         <!-- ИНФОРМАЦИЯ О ПРОЕКТЕ -->
-        <div class="project-info" id="projectInfo">
+        <div class="project-info" id="projectInfo" style="display: none;">
             <div style="font-size: 14px; color: var(--gray); margin-bottom: 10px;">📝 ВЫБРАННЫЕ УКРАШЕНИЯ:</div>
             <div class="project-selections" id="projectSelections">
                 (Выберите украшения для проекта)
@@ -115,9 +138,12 @@
             <div class="upload-area" onclick="document.getElementById('photoInput').click()" id="uploadArea">
                 <div style="font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));">📸</div>
                 <div style="font-size: 24px; color: var(--gold); margin-bottom: 12px; font-weight: 600;">Загрузите фото вашего дома</div>
-                <div style="font-size: 16px; color: var(--gray);">Сфотографируйте или выберите из галереи</div>
-                <input type="file" id="photoInput" style="display: none;" accept="image/*" capture="environment">
+                <div style="font-size: 16px; color: var(--gray);">Можно загрузить несколько фото - выберите одно для примерки</div>
+                <input type="file" id="photoInput" style="display: none;" accept="image/*" multiple capture="environment">
             </div>
+
+            <!-- ГАЛЕРЕЯ ЗАГРУЖЕННЫХ ФОТО -->
+            <div class="gallery-container" id="gallery" style="display: none;"></div>
 
             <div class="preview-container" id="previewContainer" style="display: none;">
                 <div class="preview-image">
@@ -132,7 +158,7 @@
                         </div>
                         
                         <div class="filter-option">
-                            <input type="checkbox" id="garland-fringe-white" name="garland" value="Бахрома белая" onchange="updateProject()">
+                            <input type="checkbox" id="garland-fringe-white" value="Бахрома белая" onchange="updateActions()">
                             <label for="garland-fringe-white" class="filter-label">
                                 <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/c0ca66f8-2da5-4fe2-be6c-62b09ff50f74.png">
                                 Бахрома белая
@@ -140,7 +166,7 @@
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="garland-fringe-yellow" name="garland" value="Бахрома жёлтая" onchange="updateProject()">
+                            <input type="checkbox" id="garland-fringe-yellow" value="Бахрома жёлтая" onchange="updateActions()">
                             <label for="garland-fringe-yellow" class="filter-label">
                                 <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/b66a3a68-0cfe-4e85-aaa6-3db6a1859dc1.png">
                                 Бахрома жёлтая
@@ -148,7 +174,7 @@
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="garland-neon-white" name="garland" value="Дюролайт белый" onchange="updateProject()">
+                            <input type="checkbox" id="garland-neon-white" value="Дюролайт белый" onchange="updateActions()">
                             <label for="garland-neon-white" class="filter-label">
                                 <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/ac2cb769-abe5-4315-b494-33da9edfe56a.png">
                                 Дюролайт белый
@@ -156,7 +182,7 @@
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="garland-neon-yellow" name="garland" value="Дюролайт жёлтый" onchange="updateProject()">
+                            <input type="checkbox" id="garland-neon-yellow" value="Дюролайт жёлтый" onchange="updateActions()">
                             <label for="garland-neon-yellow" class="filter-label">
                                 <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/22a24c4e-f6d0-4474-b593-6319f1874cec.png">
                                 Дюролайт жёлтый
@@ -164,7 +190,7 @@
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="garland-beltlight" name="garland" value="Белтлайт" onchange="updateProject()">
+                            <input type="checkbox" id="garland-beltlight" value="Белтлайт" onchange="updateActions()">
                             <label for="garland-beltlight" class="filter-label">
                                 <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/0a7bc676-68bc-4580-ac19-9004c6f58875.png">
                                 Белтлайт
@@ -172,8 +198,8 @@
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
-                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                            <button class="btn btn-add" onclick="addSelectionToProject('garland')">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate('garland')">👁️ Отдельно</button>
                         </div>
                     </div>
 
@@ -184,23 +210,23 @@
                         </div>
                         
                         <div class="filter-option">
-                            <input type="checkbox" id="tree-3m" name="tree" value="Ёлка 3м золото" onchange="updateProject()">
+                            <input type="checkbox" id="tree-3m" value="Ёлка 3м золото" onchange="updateActions()">
                             <label for="tree-3m" class="filter-label">Ёлка 3м (золото)</label>
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="tree-5m" name="tree" value="Ёлка 5м белая" onchange="updateProject()">
+                            <input type="checkbox" id="tree-5m" value="Ёлка 5м белая" onchange="updateActions()">
                             <label for="tree-5m" class="filter-label">Ёлка 5м (белая)</label>
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="tree-8m" name="tree" value="Ёлка 8м микс" onchange="updateProject()">
+                            <input type="checkbox" id="tree-8m" value="Ёлка 8м микс" onchange="updateActions()">
                             <label for="tree-8m" class="filter-label">Ёлка 8м (микс)</label>
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
-                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                            <button class="btn btn-add" onclick="addSelectionToProject('tree')">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate('tree')">👁️ Отдельно</button>
                         </div>
                     </div>
 
@@ -211,18 +237,18 @@
                         </div>
                         
                         <div class="filter-option">
-                            <input type="checkbox" id="entrance-wreath" name="entrance" value="Венок LED" onchange="updateProject()">
+                            <input type="checkbox" id="entrance-wreath" value="Венок LED" onchange="updateActions()">
                             <label for="entrance-wreath" class="filter-label">Венок LED</label>
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="entrance-arch" name="entrance" value="Световая арка" onchange="updateProject()">
+                            <input type="checkbox" id="entrance-arch" value="Световая арка" onchange="updateActions()">
                             <label for="entrance-arch" class="filter-label">Световая арка</label>
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
-                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                            <button class="btn btn-add" onclick="addSelectionToProject('entrance')">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate('entrance')">👁️ Отдельно</button>
                         </div>
                     </div>
 
@@ -233,23 +259,23 @@
                         </div>
                         
                         <div class="filter-option">
-                            <input type="checkbox" id="figure-deer" name="figure" value="Олени LED" onchange="updateProject()">
+                            <input type="checkbox" id="figure-deer" value="Олени LED" onchange="updateActions()">
                             <label for="figure-deer" class="filter-label">Олени LED</label>
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="figure-santa" name="figure" value="Санта с санями" onchange="updateProject()">
+                            <input type="checkbox" id="figure-santa" value="Санта с санями" onchange="updateActions()">
                             <label for="figure-santa" class="filter-label">Санта с санями</label>
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="figure-snowman" name="figure" value="Снеговик LED" onchange="updateProject()">
+                            <input type="checkbox" id="figure-snowman" value="Снеговик LED" onchange="updateActions()">
                             <label for="figure-snowman" class="filter-label">Снеговик LED</label>
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
-                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                            <button class="btn btn-add" onclick="addSelectionToProject('figure')">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate('figure')">👁️ Отдельно</button>
                         </div>
                     </div>
 
@@ -260,32 +286,32 @@
                         </div>
                         
                         <div class="filter-option">
-                            <input type="checkbox" id="tree-light-gold" name="tree-light" value="Золотая обмотка" onchange="updateProject()">
+                            <input type="checkbox" id="tree-light-gold" value="Золотая обмотка" onchange="updateActions()">
                             <label for="tree-light-gold" class="filter-label">Золотая обмотка</label>
                         </div>
 
                         <div class="filter-option">
-                            <input type="checkbox" id="tree-light-cascade" name="tree-light" value="Каскадная подсветка" onchange="updateProject()">
+                            <input type="checkbox" id="tree-light-cascade" value="Каскадная подсветка" onchange="updateActions()">
                             <label for="tree-light-cascade" class="filter-label">Каскадная подсветка</label>
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-add" onclick="addSelectionToProject()">➕ Добавить</button>
-                            <button class="btn btn-view" onclick="viewSeparate()">👁️ Отдельно</button>
+                            <button class="btn btn-add" onclick="addSelectionToProject('tree-light')">➕ Добавить</button>
+                            <button class="btn btn-view" onclick="viewSeparate('tree-light')">👁️ Отдельно</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- КНОПКА ОТПРАВКИ -->
-            <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" id="sendButtonContainer" style="display: none;">
+            <!-- КНОПКИ ДЕЙСТВИЯ -->
+            <div class="action-container hidden" id="actionContainer">
                 <button class="btn" style="background: rgba(70, 130, 180, 0.3); color: #87CEEB; border: 2px solid #87CEEB; cursor: pointer;" onclick="downloadProjectSummary()">📥 Скачать проект</button>
                 <button class="btn btn-send" onclick="sendProject()">✉️ Отправить проект в работу</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО -->
+    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ НАЗВАНИЯ ПРОЕКТА -->
     <div class="modal" id="projectModal">
         <div class="modal-content">
             <div class="modal-title">📋 Название проекта</div>
@@ -294,6 +320,29 @@
                 <button class="btn" style="background: rgba(100,100,100,0.5); border: none; color: var(--white);" onclick="closeModal()">Отмена</button>
                 <button class="btn btn-send" onclick="confirmProjectName()">Создать</button>
             </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОЖИДАНИЯ ГЕНЕРАЦИИ -->
+    <div class="waiting-modal" id="waitingModal">
+        <div class="waiting-content">
+            <div class="waiting-title">⏳ Пожалуйста, подождите</div>
+            <div class="waiting-subtitle">Сейчас здесь появится изображение вашего дома с выбранными украшениями</div>
+            <div class="spinner"></div>
+            <div style="margin-top: 40px; font-size: 18px; color: var(--snow); line-height: 1.8;">
+                <p>Пока идет генерация, запишите полезный номер телефона!</p>
+                <p>Специалист поможет вам:</p>
+            </div>
+            <div class="phone-number">+7 (993) 966-52-43</div>
+            <div class="phone-description">
+                ✓ Произвести замеры дома<br>
+                ✓ Разобраться сколько и где покупать гирлянд и оборудования<br>
+                ✓ Смонтировать и обеспечить правильное подключение<br>
+                ✓ Обеспечивать обслуживанием до конца праздников<br>
+                ✓ Хранить оборудование в межсезонье
+            </div>
+            <div id="resultContainer"></div>
+            <button class="btn btn-send close-result" id="closeResultBtn" onclick="closeWaitingModal()" style="display: none;">Готово</button>
         </div>
     </div>
 
@@ -317,15 +366,16 @@
         // ДАННЫЕ ПРОЕКТОВ
         let projects = JSON.parse(localStorage.getItem('projects')) || [];
         let currentProjectId = null;
-        let tempSelection = {};
+        let uploadedPhotos = [];
+        let currentDisplayPhotoIndex = 0;
 
         function renderProjects() {
             const list = document.getElementById('projectsList');
             list.innerHTML = '';
-            projects.forEach((p, idx) => {
+            projects.forEach((p) => {
                 const btn = document.createElement('button');
                 btn.className = `project-btn ${currentProjectId === p.id ? 'active' : ''}`;
-                btn.textContent = `${p.name} (${p.selections.length})`;
+                btn.innerHTML = `${p.name} (${p.selections.length}) <button class="delete-btn" onclick="event.stopPropagation(); deleteProject(${p.id})">✕</button>`;
                 btn.onclick = () => selectProject(p.id);
                 list.appendChild(btn);
             });
@@ -334,6 +384,7 @@
         function createNewProject() {
             document.getElementById('projectModal').classList.add('active');
             document.getElementById('projectNameInput').value = '';
+            document.getElementById('projectNameInput').focus();
         }
 
         function confirmProjectName() {
@@ -354,6 +405,16 @@
             updateProjectInfo();
         }
 
+        function deleteProject(id) {
+            if (confirm('Удалить проект?')) {
+                projects = projects.filter(p => p.id !== id);
+                if (currentProjectId === id) currentProjectId = null;
+                saveProjects();
+                renderProjects();
+                updateProjectInfo();
+            }
+        }
+
         function closeModal() {
             document.getElementById('projectModal').classList.remove('active');
         }
@@ -362,66 +423,131 @@
             currentProjectId = id;
             renderProjects();
             updateProjectInfo();
-            tempSelection = {};
-            clearCheckboxes();
+            clearAllCheckboxes();
         }
 
-        function addSelectionToProject() {
+        function addSelectionToProject(category) {
             if (!currentProjectId) { alert('Создайте проект'); return; }
             
-            const selected = getSelectedItems();
+            const selected = getSelectedItemsByCategory(category);
             if (selected.length === 0) { alert('Выберите украшение'); return; }
             
             const project = projects.find(p => p.id === currentProjectId);
             project.selections.push(...selected);
             saveProjects();
             updateProjectInfo();
-            clearCheckboxes();
+            clearCheckboxesByCategory(category);
         }
 
-        function viewSeparate() {
-            const selected = getSelectedItems();
+        function viewSeparate(category) {
+            const selected = getSelectedItemsByCategory(category);
             if (selected.length === 0) { alert('Выберите украшение'); return; }
-            alert(`Просмотр отдельно:\n\n${selected.join('\n')}`);
+            showWaitingModal(selected);
+            clearCheckboxesByCategory(category);
         }
 
-        function getSelectedItems() {
+        function getSelectedItemsByCategory(category) {
             const items = [];
-            document.querySelectorAll('.filter-option input:checked').forEach(cb => {
+            const checkboxes = document.querySelectorAll(`#previewContainer input[id*="${category}"]:checked`);
+            checkboxes.forEach(cb => {
                 items.push(cb.value);
             });
             return items;
         }
 
-        function clearCheckboxes() {
-            document.querySelectorAll('.filter-option input:checked').forEach(cb => {
+        function clearCheckboxesByCategory(category) {
+            const checkboxes = document.querySelectorAll(`#previewContainer input[id*="${category}"]:checked`);
+            checkboxes.forEach(cb => {
                 cb.checked = false;
             });
         }
 
-        function updateProject() {
-            document.getElementById('sendButtonContainer').style.display = currentProjectId ? 'grid' : 'none';
+        function clearAllCheckboxes() {
+            document.querySelectorAll('#previewContainer input:checked').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
+        function updateActions() {
+            // Проверяем есть ли выбранные элементы
         }
 
         function updateProjectInfo() {
-            if (!currentProjectId) return;
+            if (!currentProjectId) {
+                document.getElementById('projectInfo').style.display = 'none';
+                document.getElementById('actionContainer').classList.add('hidden');
+                return;
+            }
+            
             const project = projects.find(p => p.id === currentProjectId);
             if (!project) return;
             
+            document.getElementById('projectInfo').style.display = 'block';
             const info = document.getElementById('projectSelections');
             if (project.selections.length === 0) {
                 info.innerHTML = '(Выберите украшения для проекта)';
+                document.getElementById('actionContainer').classList.add('hidden');
             } else {
                 info.innerHTML = project.selections.map((s, i) => `${i+1}. ${s}`).join('<br>');
+                document.getElementById('actionContainer').classList.remove('hidden');
             }
+        }
+
+        function showWaitingModal(selections) {
+            document.getElementById('waitingModal').classList.add('active');
+            document.getElementById('resultContainer').innerHTML = '';
+            document.getElementById('closeResultBtn').style.display = 'none';
+            
+            // Имитация генерации - в реальном коде здесь вебхук к н8н
+            setTimeout(() => {
+                const resultImg = document.createElement('img');
+                resultImg.src = currentDisplayPhotoIndex < uploadedPhotos.length 
+                    ? uploadedPhotos[currentDisplayPhotoIndex] 
+                    : uploadedPhotos[0];
+                resultImg.className = 'result-image';
+                resultImg.style.opacity = '0';
+                document.getElementById('resultContainer').appendChild(resultImg);
+                
+                // Плавное появление изображения
+                setTimeout(() => {
+                    resultImg.style.transition = 'opacity 0.5s ease';
+                    resultImg.style.opacity = '1';
+                }, 100);
+                
+                document.getElementById('closeResultBtn').style.display = 'block';
+            }, 3000);
+        }
+
+        function closeWaitingModal() {
+            document.getElementById('waitingModal').classList.remove('active');
         }
 
         function sendProject() {
             if (!currentProjectId) { alert('Выберите проект'); return; }
             const project = projects.find(p => p.id === currentProjectId);
             
-            const message = `Новый проект: "${project.name}"\n\nУкрашения:\n${project.selections.map(s => '• ' + s).join('\n')}`;
-            alert('✉️ Проект отправлен!\n\n' + message);
+            // ЗДЕСЬ нужно отправить на н8н вебхук
+            const webhook_url = 'YOUR_N8N_WEBHOOK_URL'; // Замените на реальный URL
+            
+            const data = {
+                projectName: project.name,
+                decorations: project.selections,
+                photo: uploadedPhotos[currentDisplayPhotoIndex] || null,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Для теста - показываем модальное окно
+            showWaitingModal(project.selections);
+            
+            // В реальном коде:
+            // fetch(webhook_url, {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(data)
+            // }).then(res => res.json())
+            //   .then(data => {
+            //       // Обновить resultContainer с результатом
+            //   });
         }
 
         function downloadProjectSummary() {
@@ -441,21 +567,78 @@
             localStorage.setItem('projects', JSON.stringify(projects));
         }
 
-        // ФОТО
+        // ЗАГРУЗКА ФОТО
         document.getElementById('photoInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('previewImg').src = event.target.result;
-                    document.getElementById('previewContainer').style.display = 'grid';
-                    document.getElementById('sendButtonContainer').style.display = 'grid';
-                };
-                reader.readAsDataURL(file);
+            const files = e.target.files;
+            if (files.length > 0) {
+                uploadedPhotos = [];
+                const gallery = document.getElementById('gallery');
+                gallery.innerHTML = '';
+                
+                Array.from(files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        uploadedPhotos.push(event.target.result);
+                        
+                        const galleryItem = document.createElement('div');
+                        galleryItem.className = 'gallery-item';
+                        galleryItem.innerHTML = `
+                            <img src="${event.target.result}" onclick="selectPhotoFromGallery(${index})">
+                            <button class="remove-photo" onclick="event.stopPropagation(); removePhoto(${index})">✕</button>
+                        `;
+                        gallery.appendChild(galleryItem);
+                        
+                        if (index === 0) {
+                            selectPhotoFromGallery(0);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                gallery.style.display = 'grid';
             }
         });
 
+        function selectPhotoFromGallery(index) {
+            currentDisplayPhotoIndex = index;
+            document.getElementById('previewImg').src = uploadedPhotos[index];
+            document.getElementById('previewContainer').style.display = 'grid';
+            document.getElementById('uploadArea').style.display = 'none';
+            
+            // Обновляем активный элемент в галерее
+            document.querySelectorAll('.gallery-item').forEach((item, i) => {
+                item.style.border = i === index ? '3px solid var(--gold)' : '2px solid rgba(255, 215, 0, 0.3)';
+            });
+        }
+
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            renderGallery();
+            if (uploadedPhotos.length === 0) {
+                document.getElementById('previewContainer').style.display = 'none';
+                document.getElementById('uploadArea').style.display = 'block';
+                document.getElementById('gallery').style.display = 'none';
+            } else {
+                selectPhotoFromGallery(Math.min(index, uploadedPhotos.length - 1));
+            }
+        }
+
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            uploadedPhotos.forEach((photo, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.innerHTML = `
+                    <img src="${photo}" onclick="selectPhotoFromGallery(${index})">
+                    <button class="remove-photo" onclick="event.stopPropagation(); removePhoto(${index})">✕</button>
+                `;
+                gallery.appendChild(galleryItem);
+            });
+        }
+
         renderProjects();
+        updateProjectInfo();
     </script>
 </body>
 </html>

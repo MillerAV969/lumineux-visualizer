@@ -82,47 +82,49 @@
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); background: rgba(15, 15, 15, 0.9); }
         textarea { resize: vertical; min-height: 140px; }
         
-        .photo-info-box {
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 30px;
+        .file-upload { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-upload input[type=file] { position: absolute; left: -9999px; }
+        .file-upload-label { display: block; padding: 18px 20px; background: rgba(15, 15, 15, 0.8); border: 2px dashed rgba(212, 175, 55, 0.3); color: var(--gray); text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .file-upload-label:hover { border-color: var(--gold); color: var(--gold); }
+        .file-upload-label::before { content: "📸 "; font-size: 24px; display: block; margin-bottom: 10px; }
+        
+        .file-note {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 10px;
+            font-style: italic;
             text-align: center;
         }
         
-        .photo-info-box p {
-            color: var(--gray);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 10px;
+        .whatsapp-alternative {
+            background: rgba(37, 211, 102, 0.1);
+            border: 1px solid rgba(37, 211, 102, 0.3);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            text-align: center;
         }
         
-        .photo-info-box strong {
-            color: var(--gold);
-            font-size: 16px;
+        .whatsapp-alternative p {
+            color: var(--gray);
+            font-size: 13px;
+            margin-bottom: 10px;
         }
         
         .whatsapp-link {
             display: inline-block;
-            margin-top: 10px;
-            padding: 12px 30px;
+            padding: 8px 20px;
             background: #25D366;
             color: white;
             text-decoration: none;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 12px;
             transition: all 0.3s ease;
         }
         
         .whatsapp-link:hover {
             background: #128C7E;
             transform: translateY(-2px);
-        }
-        
-        .whatsapp-link::before {
-            content: "📱 ";
-            margin-right: 5px;
         }
         
         .submit-button { width: 100%; padding: 22px; background: transparent; border: 2px solid var(--gold); color: var(--gold); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.4s ease; font-family: 'Inter', sans-serif; }
@@ -312,15 +314,15 @@
             <h2 class="visualizer-title">Хотите посмотреть, как это будет<br>смотреться на вашем доме?</h2>
             <p class="visualizer-subtitle">Получите бесплатную персональную визуализацию</p>
             <ul class="visualizer-features">
-                <li>Оставьте заявку с вашими контактами</li>
-                <li>Отправьте фото дома на WhatsApp</li>
-                <li>Мы создадим 3 варианта оформления</li>
+                <li>Загрузите фото вашего дома</li>
+                <li>Мы создадим 3 варианта оформления в выбранном пакете</li>
                 <li>Отправим на email в течение 2-4 часов</li>
             </ul>
-            <a href="#visualizer" class="cta-button">Оставить заявку</a>
+            <a href="#visualizer" class="cta-button">Примерить оформление</a>
             <p class="visualizer-note">Это бесплатно и ни к чему не обязывает</p>
         </div>
     </section>
+
     <section class="packages">
         <h2 class="section-title">Коллекции</h2>
         <p class="section-subtitle">Индивидуальные решения для каждой резиденции</p>
@@ -488,16 +490,23 @@
 
     <section class="visualizer-section" id="visualizer">
         <div class="visualizer-form-container">
-            <h2 class="section-title" style="text-align: left; margin-bottom: 15px;">Получить визуализацию</h2>
-            <p class="section-subtitle" style="text-align: left; margin-bottom: 30px;">Оставьте заявку и отправьте фото дома на WhatsApp</p>
-            
-            <div class="photo-info-box">
-                <p><strong>Фото отправьте на WhatsApp:</strong></p>
-                <p>После заполнения формы отправьте фото вашего дома на наш номер WhatsApp, и мы вышлем вам 3 варианта визуализации в выбранном пакете.</p>
-                <a href="https://wa.me/79939665243?text=Здравствуйте! Хочу получить визуализацию оформления для моего дома" class="whatsapp-link" target="_blank">Отправить фото в WhatsApp</a>
-            </div>
+            <h2 class="section-title" style="text-align: left; margin-bottom: 15px;">Примерьте оформление</h2>
+            <p class="section-subtitle" style="text-align: left; margin-bottom: 40px;">Загрузите фото вашего дома и получите 3 варианта визуализации</p>
             
             <form action="https://formspree.io/f/myzbnrpl" method="POST" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="photo">Фото вашего дома (необязательно)</label>
+                    <div class="file-upload">
+                        <input type="file" id="photo" name="photo_link" accept="image/*">
+                        <label for="photo" class="file-upload-label" id="fileLabel">Выберите фото (Камера или Галерея)</label>
+                    </div>
+                    <p class="file-note">* Если фото не загружается, отправьте его на WhatsApp после заполнения формы</p>
+                    <div class="whatsapp-alternative">
+                        <p>Или отправьте фото в WhatsApp:</p>
+                        <a href="https://wa.me/79939665243?text=Здравствуйте! Отправляю фото для визуализации" class="whatsapp-link" target="_blank">📱 Отправить в WhatsApp</a>
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label for="viz-name">Имя *</label>
                     <input type="text" id="viz-name" name="name" required>
@@ -532,10 +541,11 @@
                 </div>
                 
                 <input type="hidden" name="_subject" value="Новая заявка на визуализацию - Lumineux">
-                <button type="submit" class="submit-button">Оставить заявку</button>
+                <button type="submit" class="submit-button">Получить визуализацию бесплатно</button>
             </form>
         </div>
     </section>
+
     <section class="contact-section" id="contact">
         <div class="contact-container">
             <h2 class="section-title">Консультация</h2>
@@ -602,10 +612,6 @@
                 Ваша заявка успешно принята.<br>
                 Наша команда свяжется с вами в течение 2 часов.
             </p>
-            <p class="success-message" style="font-size: 16px; margin-top: 20px;">
-                📱 Не забудьте отправить фото дома на WhatsApp:<br>
-                <a href="https://wa.me/79939665243?text=Здравствуйте! Отправляю фото для визуализации" style="color: #25D366; text-decoration: underline;" target="_blank">+7 (993) 966-52-43</a>
-            </p>
             <div class="new-year-wishes">
                 ✨ С наступающим Новым годом! ✨
             </div>
@@ -626,6 +632,12 @@
             } else {
                 header.classList.remove('scrolled');
             }
+        });
+
+        // Изменение имени файла при загрузке
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || 'Выберите фото (Камера или Галерея)';
+            document.getElementById('fileLabel').innerHTML = '✓ ' + fileName;
         });
 
         // Выбор пакета
